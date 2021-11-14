@@ -26,15 +26,6 @@ node {
         sh("docker push $DOCKER_USERNAME/${imageTag}")
     }
 
-    stage('List pods') {
-        withKubeConfig([credentialsId: 'kubernetes-config']) {
-            sh 'curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl'  
-            sh 'chmod u+x ./kubectl'  
-            sh 'mv ./kubectl /usr/local/bin/kubectl'
-            sh 'kubectl get pods'
-        }
-    }
-
     //Stage 3 : Clean the old images
     stage('Cleaning Old docker and k8 images') {
         sh("kubectl delete -k . || true")

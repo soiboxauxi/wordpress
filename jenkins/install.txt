@@ -1,3 +1,12 @@
+--- Jenkins
+cd jenkins
+
+# Set docker env
+eval $(minikube docker-env)             # unix shells
+minikube docker-env | Invoke-Expression # PowerShell
+
+docker image build -t myjenkins .
+
 kubectl create -f jenkins.yaml --namespace jenkins
 kubectl create -f jenkins-service.yaml --namespace jenkins
 

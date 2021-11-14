@@ -14,7 +14,7 @@ spec:
         spec:
             containers:
                 - name: jenkins
-                  image: jenkins/jenkins:lts
+                  image: myjenkins:latest
                   ports:
                       - name: http-port
                         containerPort: 8080
@@ -23,6 +23,12 @@ spec:
                   volumeMounts:
                       - name: jenkins-vol
                         mountPath: /var/jenkins_vol
+                      - name: docker-sock-volume
+                        mountPath: "/var/run/docker.sock"
+                  imagePullPolicy: Never
             volumes:
                 - name: jenkins-vol
                   emptyDir: {}
+                - name: docker-sock-volume
+                  hostPath:
+                      path: /var/run/docker.sock
