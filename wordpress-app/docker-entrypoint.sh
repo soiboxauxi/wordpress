@@ -160,11 +160,6 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 				}
 				{ print }
 			' wp-config-sample.php > wp-config.php <<<'EOPHP'
-			// If were behind a proxy server and using HTTPS, we need to alert Wordpress of that fact
-			// see also http://codex.wordpress.org/Administration_Over_SSL#Using_a_Reverse_Proxy
-			// if (isset($_SERVER["HTTP_X_FORWARDED_PROTO"]) && $_SERVER["HTTP_X_FORWARDED_PROTO"] === 'https') {
-			// 	$_SERVER["HTTPS"] = 'on';
-			// }
 			EOPHP
 			chown "$user:$group" wp-config.php
 		elif [ -e wp-config.php ] && [ -n "$WORDPRESS_CONFIG_EXTRA" ] && [[ "$(< wp-config.php)" != *"$WORDPRESS_CONFIG_EXTRA"* ]]; then
