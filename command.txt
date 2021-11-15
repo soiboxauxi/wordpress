@@ -1,0 +1,15 @@
+# Create password mysql
+kubectl create secret generic mysql --from-literal=password=root
+
+# Before create service, change file wordpress.yaml line 18 to your's image
+
+# Create service k8s
+kubectl apply -k .
+
+# Help command
+kubectl get all --all-namespaces
+kubectl port-forward <pod-name> 3306:3306
+kubectl logs <pod-name>
+kubectl exec --stdin --tty <pod-name> -- /bin/bash
+
+minikube service wordpress --url
