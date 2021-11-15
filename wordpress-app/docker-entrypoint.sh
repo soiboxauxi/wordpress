@@ -228,12 +228,7 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 
 		if ! TERM=dumb php -- <<<'EOPHP'
 			<?php
-			// database might not exist, so lets try creating it (just to be safe)
 			$stderr = fopen('php://stderr', 'w');
-			// https://codex.wordpress.org/Editing_wp-config.php#MySQL_Alternate_Port
-			//   "hostname:port"
-			// https://codex.wordpress.org/Editing_wp-config.php#MySQL_Sockets_or_Pipes
-			//   "hostname:unix-socket-path"
 			list($host, $socket) = explode(':', getenv('WORDPRESS_DB_HOST'), 2);
 			$port = 0;
 			if (is_numeric($socket)) {
