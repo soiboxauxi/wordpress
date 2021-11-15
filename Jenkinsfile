@@ -26,6 +26,13 @@ node {
         sh("docker push $DOCKER_USERNAME/${imageTag}")
     }
 
+    stage('List pods') {
+        withKubeConfig([serverUrl: 'https://kubernetes.default'
+                        ]) {
+        sh 'kubectl get pods'
+        }
+    }
+
     //Stage 3 : Clean the old images
     stage('Cleaning Old docker and k8 images') {
         sh("kubectl delete -k . || true")
@@ -35,32 +42,33 @@ node {
 
     //Stage 4 : Deploy Application
 
-              stage('Deploy Application To K8 Cluster') {
-                   sh("echo $namespace")
-                   switch (namespace) {
-                          //Roll out to Dev Environment
-                          case "development":
+    stage('Deploy Application To K8 Cluster') {
+        sh("echo $namespace")
+        switch (namespace) {
+            //Roll out to Dev Environment
+            case "development":
 
-                          sh ("kubectl create secret generic mysql --from-literal=password=${mysql_password} &>/dev/null")
+            sh ("kubectl create secret generic mysql --from-literal=password=${mysql_password} &>/dev/null")
 
-                          // Create K8 Services
+            // Create K8 Services
 
-                          sh("kubectl apply -k .")
+            sh("kubectl apply -k .")
 
-                          // Check for Service
-                            sh("url_c=`minikube service wordpress --url`")
-                            sh("kubectl get pods -o=wide")
-                            sh("NAME=`minikube service list|grep wordpress |awk '{print ''\$''6}'`")
+            // Check for Service
+            sh("url_c=`minikube service wordpress --url`")
+            sh("kubectl get pods -o=wide")
+            sh("NAME=`minikube service list|grep wordpress |awk '{print ''\$''6}'`"
+        )
+    }
 
-                            }
     // Stage 5 : Wait for services to be up or for 120 retries
     timeout(5) {
-    waitUntil {
-       script {
-         def r = sh script: 'url_c=`minikube service wordpress --url`; wget --retry-connrefused --tries=120 --waitretry=1 -q $url_c -O /dev/null', returnStatus: true
-         return (r == 0);
-       }
-    }
-}
+            waitUntil {
+                script {
+                    def r = sh script: 'url_c=`minikube service wordpress --url`; wget --retry-connrefused --tries=120 --waitretry=1 -q $url_c -O /dev/null', returnStatus: true
+                    return (r == 0);
+                }
+            }
+        }
       }
 }
