@@ -27,7 +27,9 @@ node {
     }
 
     stage('List pods') {
-        withKubeConfig([serverUrl: 'https://kubernetes.default']) {
+        withKubeConfig([credentialsId: 'eb1c9235-99ea-4b43-818b-446884eb2c85',
+                        serverUrl: 'https://kubernetes.default'
+                        ]) {
         sh 'kubectl get pods'
         }
     }
