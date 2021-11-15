@@ -27,8 +27,7 @@ node {
     }
 
     stage('List pods') {
-        withKubeConfig([serverUrl: 'https://kubernetes.default'
-                        ]) {
+        withKubeConfig([serverUrl: 'https://kubernetes.default']) {
         sh 'kubectl get pods'
         }
     }
