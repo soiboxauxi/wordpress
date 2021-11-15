@@ -165,10 +165,10 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 			if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
 				$_SERVER['HTTPS'] = 'on';
 			}
-            EOPHP
+			EOPHP
 			chown "$user:$group" wp-config.php
 		elif [ -e wp-config.php ] && [ -n "$WORDPRESS_CONFIG_EXTRA" ] && [[ "$(< wp-config.php)" != *"$WORDPRESS_CONFIG_EXTRA"* ]]; then
-			# (if the config file already contains the requested PHP code, don't print a warning)
+			# (if the config file already contains the requested PHP code, dont print a warning)
 			echo >&2
 			echo >&2 'WARNING: environment variable "WORDPRESS_CONFIG_EXTRA" is set, but "wp-config.php" already exists'
 			echo >&2 '  The contents of this variable will _not_ be inserted into the existing "wp-config.php" file.'
