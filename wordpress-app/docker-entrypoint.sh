@@ -135,47 +135,47 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	fi
 
 	# only touch "wp-config.php" if we have environment-supplied configuration values
-	#if [ "$haveConfig" ]; then
-	#	: "${WORDPRESS_DB_HOST:=mysql}"
-	#	: "${WORDPRESS_DB_USER:=root}"
-	#	: "${WORDPRESS_DB_PASSWORD:=}"
-	#	: "${WORDPRESS_DB_NAME:=wordpress}"
-	#	: "${WORDPRESS_DB_CHARSET:=utf8}"
-	#	: "${WORDPRESS_DB_COLLATE:=}"
-#
-	#	# version 4.4.1 decided to switch to windows line endings, that breaks our seds and awks
-	#	# https://github.com/docker-library/wordpress/issues/116
-	#	# https://github.com/WordPress/WordPress/commit/1acedc542fba2482bab88ec70d4bea4b997a92e4
-	#	sed -ri -e 's/\r$//' wp-config*
-#
-	#	if [ ! -e wp-config.php ]; then
-	#		awk '
-	#			/^\/\*.*stop editing.*\*\/$/ && c == 0 {
-	#				c = 1
-	#				system("cat")
-	#				if (ENVIRON["WORDPRESS_CONFIG_EXTRA"]) {
-	#					print "// WORDPRESS_CONFIG_EXTRA"
-	#					print ENVIRON["WORDPRESS_CONFIG_EXTRA"] "\n"
-	#				}
-	#			}
-	#			{ print }
-	#		' wp-config-sample.php > wp-config.php <<'EOPHP'
-	#		// If we're behind a proxy server and using HTTPS, we need to alert Wordpress of that fact
-	#		// see also http://codex.wordpress.org/Administration_Over_SSL#Using_a_Reverse_Proxy
-	#		if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
-	#			$_SERVER['HTTPS'] = 'on';
-	#		}
-	#		EOPHP
-	#		chown "$user:$group" wp-config.php
-	#	elif [ -e wp-config.php ] && [ -n "$WORDPRESS_CONFIG_EXTRA" ] && [[ "$(< wp-config.php)" != *"$WORDPRESS_CONFIG_EXTRA"* ]]; then
-	#		# (if the config file already contains the requested PHP code, don't print a warning)
-	#		echo >&2
-	#		echo >&2 'WARNING: environment variable "WORDPRESS_CONFIG_EXTRA" is set, but "wp-config.php" already exists'
-	#		echo >&2 '  The contents of this variable will _not_ be inserted into the existing "wp-config.php" file.'
-	#		echo >&2 '  (see https://github.com/docker-library/wordpress/issues/333 for more details)'
-	#		echo >&2
-	#	fi
-#
+	if [ "$haveConfig" ]; then
+		: "${WORDPRESS_DB_HOST:=mysql}"
+		: "${WORDPRESS_DB_USER:=root}"
+		: "${WORDPRESS_DB_PASSWORD:=}"
+		: "${WORDPRESS_DB_NAME:=wordpress}"
+		: "${WORDPRESS_DB_CHARSET:=utf8}"
+		: "${WORDPRESS_DB_COLLATE:=}"
+
+	# version 4.4.1 decided to switch to windows line endings, that breaks our seds and awks
+	# https://github.com/docker-library/wordpress/issues/116
+	# https://github.com/WordPress/WordPress/commit/1acedc542fba2482bab88ec70d4bea4b997a92e4
+		sed -ri -e 's/\r$//' wp-config*
+
+		if [ ! -e wp-config.php ]; then
+			awk '
+				/^\/\*.*stop editing.*\*\/$/ && c == 0 {
+					c = 1
+					system("cat")
+					if (ENVIRON["WORDPRESS_CONFIG_EXTRA"]) {
+						print "// WORDPRESS_CONFIG_EXTRA"
+						print ENVIRON["WORDPRESS_CONFIG_EXTRA"] "\n"
+					}
+				}
+				{ print }
+			' wp-config-sample.php > wp-config.php <<'EOPHP'
+			// If we're behind a proxy server and using HTTPS, we need to alert Wordpress of that fact
+			// see also http://codex.wordpress.org/Administration_Over_SSL#Using_a_Reverse_Proxy
+			if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+				$_SERVER['HTTPS'] = 'on';
+			}
+			EOPHP
+			chown "$user:$group" wp-config.php
+		elif [ -e wp-config.php ] && [ -n "$WORDPRESS_CONFIG_EXTRA" ] && [[ "$(< wp-config.php)" != *"$WORDPRESS_CONFIG_EXTRA"* ]]; then
+			# (if the config file already contains the requested PHP code, don't print a warning)
+			echo >&2
+			echo >&2 'WARNING: environment variable "WORDPRESS_CONFIG_EXTRA" is set, but "wp-config.php" already exists'
+			echo >&2 '  The contents of this variable will _not_ be inserted into the existing "wp-config.php" file.'
+			echo >&2 '  (see https://github.com/docker-library/wordpress/issues/333 for more details)'
+			echo >&2
+		fi
+
 	#	# see http://stackoverflow.com/a/2705678/433558
 	#	sed_escape_lhs() {
 	#		echo "$@" | sed -e 's/[]\/$*.^|[]/\\&/g'
@@ -202,14 +202,14 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	#		fi
 	#		sed -ri -e "s/($start\s*).*($end)$/\1$(sed_escape_rhs "$(php_escape "$value" "$var_type")")\3/" wp-config.php
 	#	}
-#
-	#	set_config 'DB_HOST' "$WORDPRESS_DB_HOST"
-	#	set_config 'DB_USER' "$WORDPRESS_DB_USER"
-	#	set_config 'DB_PASSWORD' "$WORDPRESS_DB_PASSWORD"
-	#	set_config 'DB_NAME' "$WORDPRESS_DB_NAME"
-	#	set_config 'DB_CHARSET' "$WORDPRESS_DB_CHARSET"
-	#	set_config 'DB_COLLATE' "$WORDPRESS_DB_COLLATE"
-#
+
+		set_config 'DB_HOST' "$WORDPRESS_DB_HOST"
+		set_config 'DB_USER' "$WORDPRESS_DB_USER"
+		set_config 'DB_PASSWORD' "$WORDPRESS_DB_PASSWORD"
+		set_config 'DB_NAME' "$WORDPRESS_DB_NAME"
+		set_config 'DB_CHARSET' "$WORDPRESS_DB_CHARSET"
+		set_config 'DB_COLLATE' "$WORDPRESS_DB_COLLATE"
+
 	#	for unique in "${uniqueEnvs[@]}"; do
 	#		uniqVar="WORDPRESS_$unique"
 	#		if [ -n "${!uniqVar}" ]; then
@@ -273,12 +273,12 @@ if [[ "$1" == apache2* ]] || [ "$1" == php-fpm ]; then
 	#		echo >&2 '  continuing anyways (which might have unexpected results)'
 	#		echo >&2
 	#	fi
-	#fi
-#
-	## now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)
-	#for e in "${envs[@]}"; do
-	#	unset "$e"
-	#done
+	fi
+
+	# now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)
+	for e in "${envs[@]}"; do
+		unset "$e"
+	done
 fi
 
 exec "$@"
